@@ -44,6 +44,11 @@ app.use(
   }),
 );
 
+//default router
+app.get('/', (req, res) => {
+  res.send('🎯 TaskNest API is running');
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
