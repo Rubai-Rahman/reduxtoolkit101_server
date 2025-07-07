@@ -12,7 +12,7 @@ const envVarsSchema = z.object({
   CORS_ORIGIN: z.string().default('*'),
   RATE_LIMIT_WINDOW_MS: z.coerce.number().default(15 * 60 * 1000), // 15 minutes
   RATE_LIMIT_MAX_REQUESTS: z.coerce.number().default(100),
-  AUTH0_DOMAIN: z.string(),
+  AUTH0_ISSUER: z.string(),
   AUTH0_AUDIENCE: z.string(),
 });
 
@@ -27,7 +27,7 @@ export const config = {
   RATE_LIMIT_WINDOW_MS: envVars.RATE_LIMIT_WINDOW_MS,
   RATE_LIMIT_MAX_REQUESTS: envVars.RATE_LIMIT_MAX_REQUESTS,
   AUTH0: {
-    DOMAIN: envVars.AUTH0_DOMAIN,
+    ISSUER: envVars.AUTH0_ISSUER,
     AUDIENCE: envVars.AUTH0_AUDIENCE,
   },
 };
