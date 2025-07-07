@@ -1,90 +1,56 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';
-import {
-  TOrders,
-  TUser,
-  TUserAddress,
-  TUserName,
-  userModel,
-} from './user.interface';
-import { config } from '@config/env';
+import { TUser, userModel } from './user.interface';
 
 const { Schema, model } = mongoose;
-
-// Define the sub-schema for fullName
-const fullNameSchema = new Schema<TUserName>({
-  firstName: {
+const userSchema = new Schema<TUser, userModel>({
+  authId: {
     type: String,
-    required: [true, 'First name is required'],
-    trim: true,
-    maxLength: [20, 'Name can not be more that 20 characters'],
-  },
-  lastName: { type: String, required: [true, 'Last name is required'] },
-});
-
-// Define the sub-schema for address
-const addressSchema = new Schema<TUserAddress>({
-  street: { type: String, required: [true, 'Street is required'] },
-  city: { type: String, required: [true, 'City is required'] },
-  country: { type: String, required: [true, 'Country is required'] },
-});
-
-// Define the sub-schema for orders
-const orderSchema = new Schema<TOrders>({
-  productName: { type: String, required: [true, 'Product name is required'] },
-  price: { type: Number, required: [true, 'Price is required'] },
-  quantity: { type: Number, required: [true, 'Quantity is required'] },
-});
-
-const userSchema = new Schema<TUser>({
-  userId: { type: Number, required: [true, 'ID is required'], unique: true },
-  username: {
-    type: String,
-    required: [true, 'Username is required'],
+    required: [true, 'authId is required'],
     unique: true,
   },
-  password: {
+  name: {
     type: String,
-    required: [true, 'Password is required'],
-    maxLength: [20, 'Password can not be more than 20 characters'],
-    default: undefined,
+    required: [true, 'Name is required'],
+    trim: true,
+    maxlength: [100, 'Name must be under 100 characters'],
   },
-  fullName: fullNameSchema,
-  age: { type: Number, required: [true, 'Age is required'] },
-  email: { type: String, required: [true, 'Email is required'], unique: true },
-  isActive: { type: Boolean, default: true },
-  hobbies: { type: [String], required: [true, 'Hobbies are required'] },
-  address: addressSchema,
-  orders: { type: [orderSchema], default: [] },
-});
-//pre hook
-userSchema.pre('save', async function (next) {
-  this.password = (await bcrypt.hash(
-    this.password as string,
-    Number(config.bycrypt_salt_rounds),
-  )) as string;
-  next();
+  email: {
+    type: String,
+    required: [true, 'Email is required'],
+    unique: true,
+    lowercase: true,
+    trim: true,
+  },
+  role: {
+    type: String,
+    enum: ['admin', 'member'],
+    default: 'member',
+  },
+  picture: {
+    type: String,
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
+  emailVerified: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-//post hook to make password empty
-userSchema.post('save', function (doc, next) {
-  doc.password = '';
-  next();
-});
-
-//custom instance
-userSchema.methods.isUserExists = async function (userId: number) {
-  const existingUser = await User.findOne({ userId });
-  return existingUser;
+// Custom static method to check user existence by authId
+userSchema.statics.isUserExists = async function (
+  authId: string,
+): Promise<TUser | null> {
+  return this.findOne({ authId });
 };
 
-userSchema.methods.isEmailUserNameExists = async function (
-  username: string,
+// Optional: custom static to check user by email
+userSchema.statics.isEmailExists = async function (
   email: string,
 ): Promise<TUser | null> {
-  const filter = { $or: [{ username }, { email }] };
-  const existingUser = await this.model('User').findOne(filter);
-  return existingUser as TUser | null;
+  return this.findOne({ email });
 };
 
 export const User = model<TUser, userModel>('User', userSchema);

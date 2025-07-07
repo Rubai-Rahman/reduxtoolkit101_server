@@ -11,11 +11,8 @@ export type TUser = {
   emailVerified?: boolean;
 };
 
-export type UserMethods = {
-  // eslint-disable-next-line no-unused-vars
-  isUserExists(userId: number): Promise<TUser | null>;
-  // eslint-disable-next-line no-unused-vars
-  isEmailUserNameExists(username: string, email: string): Promise<TUser | null>;
-};
 
-export type userModel = Model<TUser, Record<string, never>, UserMethods>;
+export interface userModel extends Model<TUser> {
+  isUserExists(authId: string | undefined): Promise<TUser | null>;
+  isEmailExists(email: string): Promise<TUser | null>;
+}
