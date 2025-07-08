@@ -11,7 +11,10 @@
     "format": "prettier --write \"src/**/*.ts\""
   },
   "_moduleAliases": {
-    "@config": "dist/config"
+    "@config": "dist/config",
+    "@middleware": "dist/middleware",
+    "@modules": "dist/modules",
+    "@utils": "dist/utils"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
