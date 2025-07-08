@@ -26,7 +26,7 @@ const syncUserIntoDB = async (userData: TUser) => {
       authId: userData.authId,
       name: userData.name,
       email: userData.email,
-      role: 'user',
+      role: 'member',
       picture: userData.picture,
       isActive: true,
       emailVerified: userData.emailVerified ?? false,
